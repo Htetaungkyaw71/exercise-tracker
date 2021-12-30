@@ -54,9 +54,11 @@ var l = []
 app.post('/api/users/:_id/exercises',(req,res)=>{
   var today = new Date()
   var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-    var d = new Date(req.body.date).toLocaleDateString("en-US", options);
+    var d = req.body.date;
     if(d == ""){
       d = today.toLocaleDateString("en-US", options)
+    }else{
+      var d = new Date(req.body.date).toLocaleDateString("en-US", options);
     }
 
     users.forEach(function(user){
