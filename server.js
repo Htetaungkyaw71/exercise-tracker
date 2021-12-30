@@ -54,7 +54,7 @@ var l = []
 app.post('/api/users/:_id/exercises',(req,res)=>{
   var today = new Date()
   var options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-    var d = req.body.date;
+    var d = new Date(req.body.date).toLocaleDateString("en-US", options);
     if(d == ""){
       d = today.toLocaleDateString("en-US", options)
     }
@@ -65,20 +65,20 @@ app.post('/api/users/:_id/exercises',(req,res)=>{
       if (user._id == req.body._id ){
         l.push(
           {
-            date: d,
-            duration: parseInt(req.body.duration),
             description:  req.body.description,
+            duration: parseInt(req.body.duration),
+            date: d,           
           }
         )
         user.logs = l
       
     
         res.json({
-          _id: req.body._id ,
           username: user.username,
-          date: d,
-          duration: parseInt(req.body.duration),
           description:  req.body.description,
+          duration: parseInt(req.body.duration),
+          date: d,
+          _id: req.body._id ,          
         })
       }else{
         console.log("error not found")
