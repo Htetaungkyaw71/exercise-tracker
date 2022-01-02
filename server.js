@@ -5,7 +5,13 @@ const bodyparser = require('body-parser');
 const { json } = require('express/lib/response')
 const mongoose = require("mongoose");
 const e = require('express');
-mongoose.connect("mongodb://localhost:27017/exerciseDB",{useNewUrlParser: true,})
+let url = "mongodb+srv://htet:"+"30221018"+"@freecodecamp.kq9tf.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
+mongoose.connect(url, {useNewUrlParser : true});
+
+const connection = mongoose.connection;
+connection.once("open", () => {
+  console.log("Connected to MongoDB database!");
+});
 require('dotenv').config()
 
 
