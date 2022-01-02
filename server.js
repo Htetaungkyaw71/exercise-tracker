@@ -78,10 +78,20 @@ app.get('/api/users',(req,res)=>{
       console.log(err)
     }
     else{
-      res.json(   
-          result
+        let users = []
+        result.forEach(function (user) {
+          n =  {
+            username:user.name,
+            _id:user._id
+          }
+          users.push(n)
+           
+          
+          })  
+          res.json(users)
         
-      )
+  
+   
     }
   })
 })
@@ -96,7 +106,11 @@ app.get('/api/users',(req,res)=>{
 
 
 app.post('/api/users/:_id/exercises',(req,res)=>{
-  var today = new Date()
+  if(req.body.duration == "" || req.body.description == ""){
+    res.send("not found")
+  }
+  else{
+    var today = new Date()
     var d = req.body.date;
     if(d == ""){
       d = today.toDateString()
@@ -109,31 +123,37 @@ app.post('/api/users/:_id/exercises',(req,res)=>{
         console.log(err)
       }
       else{
-        let e = new Exercise({
-          description:req.body.description,
-          duration:req.body.duration,
-          date: d,    
-        })
-        e.save()
-        User.updateOne({_id:req.body._id},{log:e},function (err) {
-          if(err){
-            console.log(err)
-          }
-          else{
-            console.log("successfully added")
-          }
-        })
-
-        res.json({
-          username:u.username,
-          description:  req.body.description,
-          duration: parseInt(req.body.duration),
-          date: d,
-          _id: req.body._id ,          
-        })
+          let e = new Exercise({
+            description:req.body.description,
+            duration:req.body.duration,
+            date: d,    
+          })
+          e.save()
+      
+          User.findOne({_id:req.body._id},function (err,result) {
+            if(!err){
+              result.log.push(e);
+              result.save()
+              res.json({
+                username:u.username,
+                description:  req.body.description,
+                duration: parseInt(req.body.duration),
+                date: d,
+                _id: req.body._id ,          
+              })
+            }
+          })
+  
+      
+        
+ 
 
       }
   })
+  }
+
+
+
  
 })
 
@@ -142,6 +162,7 @@ app.get("/api/users/:_id/logs",(req,res)=>{
   const {from,to,limit} = req.query
   var  user_id = req.params._id
   User.findById({_id:user_id},function (err,user) {
+    console.log(user)
       if(err){
         console.log(err)
       }
@@ -158,7 +179,9 @@ app.get("/api/users/:_id/logs",(req,res)=>{
           user.log = user.log.slice(0,+limit)
           
         }
+     
        res.json(
+         
         {
           username:user.name,
           count: user.log.length,
