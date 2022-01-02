@@ -112,6 +112,8 @@ app.get('/api/users',(req,res)=>{
 
 
 app.post('/api/users/:_id/exercises',(req,res)=>{
+  let post_id = mongoose.Types.ObjectId(req.params._id);
+  console.log(post_id)
   if(req.body.duration == "" || req.body.description == ""){
     res.send("not found")
   }
@@ -120,11 +122,11 @@ app.post('/api/users/:_id/exercises',(req,res)=>{
     var d = req.body.date;
     if(d == ""){
       d = today.toDateString()
-    }else{
+    }else{  
       var d = new Date(req.body.date).toDateString();
     }
 
-  User.findById({_id:req.body._id},function (err,u) {
+  User.findById({_id:post_id},function (err,u) {
       if(err){
         console.log(err)
       }
@@ -136,7 +138,7 @@ app.post('/api/users/:_id/exercises',(req,res)=>{
           })
           e.save()
       
-          User.findOne({_id:req.body._id},function (err,result) {
+          User.findOne({_id:post_id},function (err,result) {
             if(!err){
               result.log.push(e);
               result.save()
@@ -166,7 +168,7 @@ app.post('/api/users/:_id/exercises',(req,res)=>{
 
 app.get("/api/users/:_id/logs",(req,res)=>{
   const {from,to,limit} = req.query
-  var  user_id = req.params._id
+  var  user_id = mongoose.Types.ObjectId(req.params._id);
   User.findById({_id:user_id},function (err,user) {
     console.log(user)
       if(err){
