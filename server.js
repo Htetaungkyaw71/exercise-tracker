@@ -141,7 +141,7 @@ app.post('/api/users/:_id/exercises',(req,res)=>{
               result.log.push(e);
               result.save()
               res.json({
-                username:u.username,
+                username:result.name,
                 description:  req.body.description,
                 duration: parseInt(req.body.duration),
                 date: d,
