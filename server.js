@@ -112,18 +112,20 @@ app.get('/api/users',(req,res)=>{
 
 
 app.post('/api/users/:_id/exercises',(req,res)=>{
+
   let post_id = mongoose.Types.ObjectId(req.params._id);
-  console.log(post_id)
+ 
   if(req.body.duration == "" || req.body.description == ""){
     res.send("not found")
   }
   else{
     var today = new Date()
+    
     var d = req.body.date;
     if(d == ""){
-      d = today.toDateString()
+      d = today.toString().substring(0,15)
     }else{  
-      var d = new Date(req.body.date).toDateString();
+       d = new Date(req.body.date).toString().substring(0,15);
     }
 
   User.findById({_id:post_id},function (err,u) {
@@ -142,12 +144,13 @@ app.post('/api/users/:_id/exercises',(req,res)=>{
             if(!err){
               result.log.push(e);
               result.save()
+              console.log(typeof(d))
               res.json({
                 username:result.name,
                 description:  req.body.description,
                 duration: parseInt(req.body.duration),
                 date: d,
-                _id: req.body._id ,          
+                _id: post_id,          
               })
             }
           })
@@ -170,7 +173,6 @@ app.get("/api/users/:_id/logs",(req,res)=>{
   const {from,to,limit} = req.query
   var  user_id = mongoose.Types.ObjectId(req.params._id);
   User.findById({_id:user_id},function (err,user) {
-    console.log(user)
       if(err){
         console.log(err)
       }
@@ -187,14 +189,24 @@ app.get("/api/users/:_id/logs",(req,res)=>{
           user.log = user.log.slice(0,+limit)
           
         }
+        let m = []
+        user.log.forEach(function (w) {
+           let a = {
+              description:w.description,
+              duration:w.duration,
+              date:w.date,
+            }
+     
+            m.push(a)
+        })
      
        res.json(
          
         {
+          _id:user._id,
           username:user.name,
           count: user.log.length,
-          _id:user._id,
-          log:user.log
+          log:m
         }
        )
       
